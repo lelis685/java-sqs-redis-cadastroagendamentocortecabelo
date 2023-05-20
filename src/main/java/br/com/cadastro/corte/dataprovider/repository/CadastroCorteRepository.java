@@ -19,4 +19,10 @@ public class CadastroCorteRepository {
         template.opsForValue().set(chave, valor);
     }
 
+
+    public ValorCadastro findByKey(String chave) throws JsonProcessingException {
+        String valor = template.opsForValue().get(chave);
+        return mapper.readValue(valor, ValorCadastro.class);
+    }
+
 }

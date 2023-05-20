@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -21,13 +22,11 @@ public class CadastroCorteService {
     private final CadastroCorteRepository repository;
 
     public void process(CadastroMessage message) {
-
         findTipoCorteCabelo(message.getTipoCorte())
                 .ifPresentOrElse(
                         (tipoCorte) -> salvar(message, tipoCorte),
                         () -> log.warn("Tipo de corte nao encontrado.")
                 );
-
 
     }
 
@@ -67,4 +66,12 @@ public class CadastroCorteService {
     }
 
 
+    public ValorCadastro findByKey(String tipoCorte, String cpf, LocalDate data) throws JsonProcessingException {
+        String chave = ChaveCadastro.builder()
+                .dataAgendamento(data.toString())
+                .cpf(cpf)
+                .tipoCorte(tipoCorte).build().toString();
+
+        return repository.findByKey(chave);
+    }
 }

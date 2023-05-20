@@ -3,6 +3,7 @@ package br.com.cadastro.corte.dataprovider.repository.data;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -16,10 +17,10 @@ public class ChaveCadastro {
 
     @Override
     public String toString() {
-        LocalDateTime data = LocalDateTime.parse(dataAgendamento);
+        LocalDate data = LocalDate.parse(dataAgendamento);
 
         return new StringBuilder()
-                .append(data.toLocalDate().toString())
+                .append(data.toString())
                 .append(AGGREGATOR)
                 .append(cpf)
                 .append(AGGREGATOR)
