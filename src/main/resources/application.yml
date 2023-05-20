@@ -1,0 +1,21 @@
+server:
+  port: 8084
+
+cloud:
+  aws:
+    stack:
+      auto: false
+    region:
+      static: us-east-1
+      auto: false
+    credentials:
+      access-key: batata
+      secret-key: batata
+    queue:
+      uri: http://localhost:4566
+      name: sqs-cadastro-corte-cabelo
+
+
+redis:
+  host: localhost
+  port: 6379
