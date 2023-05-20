@@ -21,7 +21,8 @@ public class CadastroCorteController {
     public ValorCadastro encontrarCadastroPorChave(
             @PathVariable String tipoCorte,
             @PathVariable String cpf,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data){
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate data){
 
        return service.findByKey(tipoCorte, cpf, data);
     }
