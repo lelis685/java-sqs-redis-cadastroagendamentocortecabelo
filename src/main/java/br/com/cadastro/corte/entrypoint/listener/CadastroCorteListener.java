@@ -5,12 +5,13 @@ import br.com.cadastro.corte.domain.service.CadastroCorteService;
 import br.com.cadastro.corte.entrypoint.listener.data.CadastroMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
+import io.prometheus.client.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.stereotype.Component;
+
+import java.util.Random;
+
 
 @Slf4j
 @Component
@@ -19,38 +20,50 @@ public class CadastroCorteListener {
     private ObjectMapper mapper;
     private CadastroCorteService service;
 
-    private Counter messageCounter;
-    private Counter successMessageCounter;
-    private Counter errorMessageCounter;
+    private final Counter counter;
+    private final Histogram histogram;
+    private final Summary summary;
+    private final Gauge gauge;
 
-    public CadastroCorteListener(ObjectMapper mapper, CadastroCorteService service, MeterRegistry meterRegistry) {
+    public CadastroCorteListener(ObjectMapper mapper, CadastroCorteService service, CollectorRegistry collectorRegistry) {
         this.mapper = mapper;
         this.service = service;
 
-        messageCounter = Counter.builder("messages")
-                .tag("tipo", "total")
-                .description("Total Mensagens recebidas")
-                .register(meterRegistry);
+        counter = Counter.build()
+                .name("messages")
+                .help("Number of sqs messages")
+                .labelNames("tipo")
+                .register(collectorRegistry);
 
-        successMessageCounter = Counter.builder("messages")
-                .tag("tipo", "sucesso")
-                .description("Total Mensagens processadas com sucesso.")
-                .register(meterRegistry);
+        histogram = Histogram.build()
+                .name("duration_histogram_process_message")
+                .help("Duration process sqs message.")
+                .buckets(0.01, 0.03, 0.05, 0.07, 0.1, 0.3, 0.5)
+                .register(collectorRegistry);
 
-        errorMessageCounter = Counter.builder("messages")
-                .tag("tipo", "error")
-                .description("Total Mensagens com error.")
-                .register(meterRegistry);
+        summary = Summary.build()
+                .name("duration_summary_process_message")
+                .help("Duration process sqs message.")
+                .quantile(0.5, 0.001)
+                .quantile(0.9, 0.001)
+                .quantile(0.99, 0.001)
+                .register(collectorRegistry);
+
+        gauge = Gauge.build()
+                .name("message_size")
+                .help("Message size")
+                .register(collectorRegistry);
+
     }
 
-    @Timed(value = "duration.process.message",histogram = true)
     @SqsListener("${cloud.aws.queue.name}")
     public void onMessage(String rawMessage) {
-
+        Histogram.Timer timer = histogram.startTimer();
+        Summary.Timer timerSummary = summary.startTimer();
         try {
             log.info("Mensagem recebida {}", rawMessage);
-
-            messageCounter.increment();
+            counter.labels("total").inc();
+            gauge.set(new Random().nextInt());
 
             CadastroMessage message = mapper.readValue(rawMessage, CadastroMessage.class);
 
@@ -58,11 +71,15 @@ public class CadastroCorteListener {
 
             log.info("Mensagem processada com sucesso.");
 
-            successMessageCounter.increment();
+            counter.labels("sucesso").inc();
 
         } catch (JsonProcessingException e) {
             log.error("Error ao processar mensagem");
-            errorMessageCounter.increment();
+            counter.labels("error").inc();
+
+        } finally {
+            timerSummary.observeDuration();
+            timer.observeDuration();
         }
     }
 

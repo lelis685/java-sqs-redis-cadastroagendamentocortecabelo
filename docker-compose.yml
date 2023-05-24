@@ -33,7 +33,7 @@ services:
     image: prom/prometheus:latest
     volumes:
       - ./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
+#      - prometheus_data:/prometheus
     networks:
       - aw-network
     ports:
@@ -50,5 +50,5 @@ services:
 
 volumes:
   redis_data:
-  prometheus_data:
+#  prometheus_data:
   grafana_data:
