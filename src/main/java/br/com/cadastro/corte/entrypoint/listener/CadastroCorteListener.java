@@ -38,14 +38,15 @@ public class CadastroCorteListener {
         histogram = Histogram.build()
                 .name("duration_histogram_process_message")
                 .help("Duration process sqs message.")
-                .buckets(0.01, 0.03, 0.05, 0.07, 0.1, 0.3, 0.5)
+                .buckets(0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07)
                 .register(collectorRegistry);
 
         summary = Summary.build()
-                .name("duration_summary_process_message")
+                .name("duration_process_message_seconds")
                 .help("Duration process sqs message.")
                 .quantile(0.5, 0.001)
                 .quantile(0.9, 0.001)
+                .quantile(0.95, 0.001)
                 .quantile(0.99, 0.001)
                 .register(collectorRegistry);
 
@@ -60,10 +61,11 @@ public class CadastroCorteListener {
     public void onMessage(String rawMessage) {
         Histogram.Timer timer = histogram.startTimer();
         Summary.Timer timerSummary = summary.startTimer();
+        long startTime = System.nanoTime();
         try {
             log.info("Mensagem recebida {}", rawMessage);
             counter.labels("total").inc();
-            gauge.set(new Random().nextInt());
+            gauge.set(new Random().nextInt(10, 1000));
 
             CadastroMessage message = mapper.readValue(rawMessage, CadastroMessage.class);
 
@@ -78,6 +80,12 @@ public class CadastroCorteListener {
             counter.labels("error").inc();
 
         } finally {
+            long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1000000;
+
+            log.info("Duration Java {}", duration);
+            log.info("Duration Summary {}", timerSummary.observeDuration());
+            log.info("Duration Histogram {}", timerSummary.observeDuration());
             timerSummary.observeDuration();
             timer.observeDuration();
         }

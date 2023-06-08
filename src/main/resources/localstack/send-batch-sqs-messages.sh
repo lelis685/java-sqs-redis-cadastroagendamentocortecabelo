@@ -5,7 +5,7 @@ set -euo pipefail
 AWS_REGION=us-east-1
 QUEUE_URL="http://localhost:4566/000000000000/sqs-cadastro-corte-cabelo"
 MESSAGE_BODY_PATH=file://message.json
-NUMBER_OF_MESSAGES=10
+NUMBER_OF_MESSAGES=10000
 
 send_message() {
     echo "sending ${NUMBER_OF_MESSAGES} sqs message"
