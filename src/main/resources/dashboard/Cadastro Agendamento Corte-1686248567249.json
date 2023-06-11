@@ -30,6 +30,12 @@
       "version": ""
     },
     {
+      "type": "panel",
+      "id": "piechart",
+      "name": "Pie chart",
+      "version": ""
+    },
+    {
       "type": "datasource",
       "id": "prometheus",
       "name": "Prometheus",
@@ -39,12 +45,6 @@
       "type": "panel",
       "id": "stat",
       "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table",
-      "name": "Table",
       "version": ""
     },
     {
@@ -101,98 +101,62 @@
   "liveNow": false,
   "panels": [
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 156,
-      "panels": [],
-      "title": "Volumetria Cadastra Agendamento",
-      "type": "row"
-    },
-    {
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic",
-            "seriesBy": "last"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "gradientMode": "hue",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 85
+              },
+              {
+                "color": "yellow",
+                "value": 90
+              },
+              {
+                "color": "green",
+                "value": 95
               }
             ]
           },
-          "unit": "opm"
+          "unit": "percent"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
-        "w": 10,
+        "h": 4,
+        "w": 3,
         "x": 0,
-        "y": 1
+        "y": 0
       },
-      "id": 165,
+      "id": 174,
       "options": {
-        "legend": {
+        "orientation": "auto",
+        "reduceOptions": {
           "calcs": [
-            "lastNotNull",
-            "min",
-            "max"
+            "lastNotNull"
           ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
       },
       "pluginVersion": "9.5.2",
       "targets": [
@@ -203,41 +167,225 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(sum(rate(messages_total{tipo=\"total\"}[1m])) > 0) * 60 ",
+          "expr": "sum(increase(messages_total{tipo=\"total\"}[$__range_ss])) == 0 or 100\r\n*\r\n  (\r\n       sum(increase(messages_total{tipo=\"sucesso\"}[$__range_ss]))\r\n    /\r\n       sum(increase(messages_total{tipo=\"total\"}[$__range_ss]))\r\n  )",
           "format": "time_series",
-          "instant": false,
+          "instant": true,
           "interval": "",
-          "legendFormat": "Total",
-          "range": true,
+          "legendFormat": "__auto",
+          "range": false,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "(sum(rate(messages_total{tipo=\"sucesso\"}[1m])) > 0 ) * 60",
-          "hide": false,
-          "legendFormat": "Sucesso",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(messages_total{tipo=\"error\"}[1m])) * 60",
-          "hide": false,
-          "legendFormat": "Error",
-          "range": true,
-          "refId": "C"
         }
       ],
-      "title": "RPM mensagens processadas",
-      "type": "timeseries"
+      "title": "% sucesso",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 3,
+        "y": 0
+      },
+      "id": 192,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(increase(messages_total{tipo=\"sucesso\"}[$__range_ss])) == 0 or sum(increase(messages_total{tipo=\"sucesso\"}[$__range_ss]))",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Sucesso",
+          "range": false,
+          "refId": "Sucesso"
+        }
+      ],
+      "title": "Sucesso",
+      "transformations": [],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 5,
+        "y": 0
+      },
+      "id": 219,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(increase(messages_total{tipo=\"error\"}[$__range_ss])) == 0 or sum(increase(messages_total{tipo=\"error\"}[$__range_ss]))",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Error",
+          "range": false,
+          "refId": "Error"
+        }
+      ],
+      "title": "Error",
+      "transformations": [],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 2,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 7,
+        "y": 0
+      },
+      "id": 183,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(up{job=\"cadastroagendamentocorte-job\"})",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Targets",
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -305,9 +453,9 @@
       },
       "gridPos": {
         "h": 11,
-        "w": 14,
-        "x": 10,
-        "y": 1
+        "w": 15,
+        "x": 9,
+        "y": 0
       },
       "id": 201,
       "options": {
@@ -350,195 +498,54 @@
       },
       "fieldConfig": {
         "defaults": {
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 0
-              },
-              {
-                "color": "orange",
-                "value": 85
-              },
-              {
-                "color": "yellow",
-                "value": 90
-              },
-              {
-                "color": "green",
-                "value": 95
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 0,
-        "y": 12
-      },
-      "id": 174,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "9.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "  100*(\r\n      (\r\n          \r\n              (\r\n                  sum(messages_total{tipo=\"sucesso\"} @ ${__from:date:seconds})\r\n                -\r\n                  sum(messages_total{tipo=\"sucesso\"} @ ${__to:date:seconds})\r\n              )\r\n      )\r\n    /\r\n      (\r\n          sum(messages_total{tipo=\"total\"} @ ${__from:date:seconds})\r\n        -\r\n          sum(messages_total{tipo=\"total\"} @ ${__to:date:seconds})\r\n      )\r\n  )",
-          "format": "time_series",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "% sucesso",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
           "color": {
             "mode": "thresholds"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "log": 2,
+              "type": "symlog"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "max": 2,
           "min": 0,
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
               },
               {
                 "color": "red",
                 "value": 2
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 3,
-        "y": 12
-      },
-      "id": 183,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "9.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "up{job=\"cadastroagendamentocorte-job\"}",
-          "format": "time_series",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "Targets",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "green",
-            "mode": "fixed"
-          },
-          "custom": {
-            "align": "center",
-            "cellOptions": {
-              "mode": "gradient",
-              "type": "gauge",
-              "valueDisplayMode": "color"
-            },
-            "filterable": true,
-            "inspect": true
-          },
-          "mappings": [
-            {
-              "options": {
-                "error": {
-                  "color": "red",
-                  "index": 1,
-                  "text": "Error"
-                },
-                "sucesso": {
-                  "color": "green",
-                  "index": 0,
-                  "text": "Sucesso"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
               }
             ]
           },
@@ -547,33 +554,188 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 18,
-        "x": 6,
-        "y": 12
+        "h": 7,
+        "w": 9,
+        "x": 0,
+        "y": 4
       },
-      "id": 192,
+      "id": 228,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "enablePagination": false,
-          "fields": [
-            "Value"
-          ],
-          "reducer": [
-            "sum"
-          ],
-          "show": true
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "frameIndex": 1,
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": false,
-            "displayName": "Time"
-          }
-        ]
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (job) (up{job=\"cadastroagendamentocorte-job\"}) ",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Targets ao longo do tempo",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 11
+      },
+      "id": 237,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (job) (up{job=\"cadastroagendamentocorte-job\"}) ",
+          "legendFormat": "Healthy",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Saude Targets",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "wpm"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 11
+      },
+      "id": 165,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "asc"
+        }
       },
       "pluginVersion": "9.5.2",
       "targets": [
@@ -584,38 +746,141 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by (tipo) (\r\n  messages_total{tipo=~\"error|sucesso\"} @ ${__to:date:seconds} - messages_total{tipo=~\"error|sucesso\"} @ ${__from:date:seconds}\r\n  )",
-          "format": "table",
-          "instant": true,
+          "expr": "(sum(rate(messages_total{tipo=\"total\"}[1m])) > 0) * 60 or vector(0)",
+          "format": "time_series",
+          "instant": false,
           "interval": "",
-          "legendFormat": "__auto",
-          "range": false,
+          "legendFormat": "Total",
+          "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Processamento",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "Value": false,
-              "tipo": false
+      "title": "RPM mensagens processadas",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "indexByName": {},
-            "renameByName": {
-              "Time": "",
-              "Value": "Total",
-              "tipo": "Tipo"
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
-          }
+          },
+          "mappings": [],
+          "min": 0,
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "wpm"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 11
+      },
+      "id": 210,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "asc"
+        }
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(sum(rate(messages_total{tipo=\"error\"}[1m])) >0 ) * 60 or vector(0)",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Error",
+          "range": true,
+          "refId": "A"
         }
       ],
-      "type": "table"
+      "title": "RPM mensagens não processadas",
+      "type": "timeseries"
     },
     {
       "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 156,
+      "panels": [],
+      "title": "Volumetria Cadastra Agendamento",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
       "datasource": {
         "type": "prometheus",
         "uid": "bc7e37f4-07ca-4a75-8a30-417690827ac7"
@@ -624,10 +889,346 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 20
       },
       "id": 139,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 1,
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 6,
+            "x": 0,
+            "y": 26
+          },
+          "id": 63,
+          "links": [],
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.5.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "process_uptime_seconds{application=\"$application\", instance=\"$instance\"}",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "refId": "A",
+              "step": 14400
+            }
+          ],
+          "title": "Uptime",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "dateTimeAsIso"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 6,
+            "x": 6,
+            "y": 26
+          },
+          "id": 92,
+          "links": [],
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.5.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "process_start_time_seconds{application=\"$application\", instance=\"$instance\"}*1000",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "refId": "A",
+              "step": 14400
+            }
+          ],
+          "title": "Start time",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 2,
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "rgba(50, 172, 45, 0.97)"
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 70
+                  },
+                  {
+                    "color": "rgba(245, 54, 54, 0.9)",
+                    "value": 90
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 6,
+            "x": 12,
+            "y": 26
+          },
+          "id": 65,
+          "links": [],
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.5.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "sum(jvm_memory_used_bytes{application=\"$application\", instance=\"$instance\", area=\"heap\"})*100/sum(jvm_memory_max_bytes{application=\"$application\",instance=\"$instance\", area=\"heap\"})",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 14400
+            }
+          ],
+          "title": "Heap used",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 2,
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                },
+                {
+                  "options": {
+                    "from": -1e+32,
+                    "result": {
+                      "text": "N/A"
+                    },
+                    "to": 0
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "rgba(50, 172, 45, 0.97)"
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 70
+                  },
+                  {
+                    "color": "rgba(245, 54, 54, 0.9)",
+                    "value": 90
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 6,
+            "x": 18,
+            "y": 26
+          },
+          "id": 75,
+          "links": [],
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.5.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "sum(jvm_memory_used_bytes{application=\"$application\", instance=\"$instance\", area=\"nonheap\"})*100/sum(jvm_memory_max_bytes{application=\"$application\",instance=\"$instance\", area=\"nonheap\"})",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 14400
+            }
+          ],
+          "title": "Non-Heap used",
+          "type": "stat"
+        }
+      ],
       "targets": [
         {
           "datasource": {
@@ -639,345 +1240,6 @@
       ],
       "title": "Quick Facts",
       "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 0,
-        "y": 18
-      },
-      "id": 63,
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "9.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "process_uptime_seconds{application=\"$application\", instance=\"$instance\"}",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "",
-          "metric": "",
-          "refId": "A",
-          "step": 14400
-        }
-      ],
-      "title": "Uptime",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "dateTimeAsIso"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 6,
-        "y": 18
-      },
-      "id": 92,
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "9.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "process_start_time_seconds{application=\"$application\", instance=\"$instance\"}*1000",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "",
-          "metric": "",
-          "refId": "A",
-          "step": 14400
-        }
-      ],
-      "title": "Start time",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 2,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "rgba(50, 172, 45, 0.97)",
-                "value": null
-              },
-              {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 70
-              },
-              {
-                "color": "rgba(245, 54, 54, 0.9)",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 12,
-        "y": 18
-      },
-      "id": 65,
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "9.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "sum(jvm_memory_used_bytes{application=\"$application\", instance=\"$instance\", area=\"heap\"})*100/sum(jvm_memory_max_bytes{application=\"$application\",instance=\"$instance\", area=\"heap\"})",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "",
-          "refId": "A",
-          "step": 14400
-        }
-      ],
-      "title": "Heap used",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 2,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            },
-            {
-              "options": {
-                "from": -1e+32,
-                "result": {
-                  "text": "N/A"
-                },
-                "to": 0
-              },
-              "type": "range"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "rgba(50, 172, 45, 0.97)",
-                "value": null
-              },
-              {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 70
-              },
-              {
-                "color": "rgba(245, 54, 54, 0.9)",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 18,
-        "y": 18
-      },
-      "id": 75,
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "9.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "sum(jvm_memory_used_bytes{application=\"$application\", instance=\"$instance\", area=\"nonheap\"})*100/sum(jvm_memory_max_bytes{application=\"$application\",instance=\"$instance\", area=\"nonheap\"})",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "",
-          "refId": "A",
-          "step": 14400
-        }
-      ],
-      "title": "Non-Heap used",
-      "type": "stat"
     },
     {
       "collapsed": false,
@@ -3872,7 +4134,7 @@
       }
     }
   ],
-  "refresh": "30s",
+  "refresh": "10s",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -4004,7 +4266,7 @@
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-1m",
     "to": "now"
   },
   "timepicker": {
@@ -4036,6 +4298,6 @@
   "timezone": "browser",
   "title": "Cadastro Agendamento Corte",
   "uid": "bd02bd82-f161-41c4-a136-7700b1ef8276",
-  "version": 18,
+  "version": 30,
   "weekStart": ""
 }

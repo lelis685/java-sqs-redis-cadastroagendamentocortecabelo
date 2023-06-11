@@ -7,7 +7,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.prometheus.client.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.aws.messaging.listener.Acknowledgment;
+import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
@@ -57,8 +60,8 @@ public class CadastroCorteListener {
 
     }
 
-    @SqsListener("${cloud.aws.queue.name}")
-    public void onMessage(String rawMessage) {
+    @SqsListener(value = "${cloud.aws.queue.name}")
+    public void onMessage(@Payload String rawMessage) {
         Histogram.Timer timer = histogram.startTimer();
         Summary.Timer timerSummary = summary.startTimer();
         long startTime = System.nanoTime();
@@ -80,6 +83,7 @@ public class CadastroCorteListener {
             counter.labels("error").inc();
 
         } finally {
+          //  ack.acknowledge();
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000;
 

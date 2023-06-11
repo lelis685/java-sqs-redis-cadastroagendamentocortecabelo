@@ -1,6 +1,6 @@
 version: '3.8'
 
-
+# mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8085
 networks:
   aw-network:
     driver: bridge
